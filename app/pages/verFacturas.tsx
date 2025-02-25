@@ -6,7 +6,7 @@ export default function Page2 () {
         <View style={styles.container}>
         <Text>Page 2</Text>
         <Link style={styles.button} href={{
-                    pathname: "/pages/page1",
+                    pathname: "/pages/agregarFacturas",
                 }}> 
                 <Text>Go to page 1</Text>
                 </Link>
@@ -19,7 +19,7 @@ export default function Page2 () {
             <Link style={styles.button} href="..">
                 Atrás
             </Link>
-            
+
         </View>
 
     );
