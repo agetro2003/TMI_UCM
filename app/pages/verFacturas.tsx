@@ -13,8 +13,14 @@ export default function Page2 () {
         <Link style={styles.button} href={{
             pathname: "/",
         }}>
-            <Text>Go to index </Text></Link>      
-              </View>
+            <Text>Go to index </Text></Link>     
+
+
+            <Link style={styles.button} href="..">
+                Atrás
+            </Link>
+            
+        </View>
 
     );
 }

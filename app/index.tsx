@@ -1,19 +1,46 @@
 import { StyleSheet, Text, View } from "react-native";
-import { Link } from "expo-router";
+import { Link, Stack } from "expo-router";
+
 export default function Hello() {
     return (
 
+
         <View style={styles.container}>
+
+        <Stack.Screen
+         options={{
+          title: 'My home',
+          headerStyle: { backgroundColor: '#f4511e' },
+          headerTintColor: '#fff',
+          headerTitleStyle: { fontWeight: 'bold' },
+        }}/>
+
+
+
         <Text>Hello, world!</Text>
+
         <Link style={styles.button} href={{
-          pathname: "/pages/page1",
+          pathname: "/pages/agregarFacturas",
         }}>
-          Go to page 1
+          Agregar facturas
         </Link>
+
         <Link style={styles.button}  href={{
-          pathname: "/pages/page2",
+          pathname: "/pages/verFacturas",
         }}>
-          Go to page 2
+          Ver facturas
+        </Link>
+
+        <Link style={styles.button}  href={{
+          pathname: "/pages/verInformes",
+        }}>
+          Ver informes
+        </Link>
+
+        <Link style={styles.button}  href={{
+          pathname: "/pages/realizarComparacion",
+        }}>
+          Ver informes
         </Link>
 
         </View>
