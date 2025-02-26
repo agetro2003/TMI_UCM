@@ -1,28 +1,45 @@
 import { Link } from "expo-router";
 import { useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
-import { launchImageLibrary } from "react-native-image-picker";
+import { Button, Image, StyleSheet, Text, View } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 
 export default function AgregarFacturas () {
     const [image, setImage] = useState<string | null>(null);
 
-    const imagenGaleria = async () => {
-        const result = await launchImageLibrary({
-            mediaType: "photo",
-        });
-        const uri = result.assets?.[0].uri;
-        setImage(uri as string);
-    };
-
+    const pickImage = async () => {
+        // No permissions request is necessary for launching the image library
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            quality: 1,
+          });
+      
+          console.log(result);
+      
+          if (!result.canceled) {
+            setImage(result.assets[0].uri);
+          }
+      };
+      const takeImage = async () => {
+        // No permissions request is necessary for launching the camera
+        let result = await ImagePicker.launchCameraAsync({
+            mediaTypes: ['images'],
+            quality: 1,
+          });
+      
+          console.log(result);
+      
+          if (!result.canceled) {
+            setImage(result.assets[0].uri);
+          }
+        }
 
     return (
         <View style={styles.container}>
         <Text>Agregar facturas</Text>
 
-       
-        <Text style={styles.button} onPress={imagenGaleria}>Buscar foto</Text>
-
-        <Image style={{ width: 200, height: 200 }} source={{uri:image as string }} />
+        <Button title="Seleccionar imagen" onPress={pickImage} />
+        <Button title="Tomar imagen" onPress={takeImage} />
+        <Image style={{ width: 200, height: 400 }} source={{uri:image as string }} />
         </View>
     );
 }
@@ -40,4 +57,4 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 5,
     },
-});
+})
