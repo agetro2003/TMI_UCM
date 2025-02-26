@@ -1,45 +1,17 @@
-import { Link } from "expo-router";
+import SelectImage from "@/components/SelectImage";
 import { useState } from "react";
-import { Button, Image, StyleSheet, Text, View } from "react-native";
-import * as ImagePicker from "expo-image-picker";
+import { Image, StyleSheet, Text, View } from "react-native";
 
 export default function AgregarFacturas () {
     const [image, setImage] = useState<string | null>(null);
 
-    const pickImage = async () => {
-        // No permissions request is necessary for launching the image library
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ['images'],
-            quality: 1,
-          });
-      
-          console.log(result);
-      
-          if (!result.canceled) {
-            setImage(result.assets[0].uri);
-          }
-      };
-      const takeImage = async () => {
-        // No permissions request is necessary for launching the camera
-        let result = await ImagePicker.launchCameraAsync({
-            mediaTypes: ['images'],
-            quality: 1,
-          });
-      
-          console.log(result);
-      
-          if (!result.canceled) {
-            setImage(result.assets[0].uri);
-          }
-        }
 
     return (
         <View style={styles.container}>
-        <Text>Agregar facturas</Text>
-
-        <Button title="Seleccionar imagen" onPress={pickImage} />
-        <Button title="Tomar imagen" onPress={takeImage} />
-        <Image style={{ width: 200, height: 400 }} source={{uri:image as string }} />
+        <Text style={styles.headerText}>Seleccione una imagen para procesar</Text>
+        
+        <Image style={styles.image} source={{uri:image as string }} />
+        <SelectImage setImage={setImage} />
         </View>
     );
 }
@@ -51,10 +23,17 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
     },
-    button: {
-        backgroundColor: "blue",
-        color: "white",
-        padding: 10,
-        borderRadius: 5,
+    headerText: {
+        fontSize: 20,
+        margin: 10,
+        fontWeight: "bold",
     },
+    image: {
+        width: 280, 
+        height: 500 ,
+        margin: 10,
+        borderWidth: 1,
+        borderColor: "black",
+        backgroundColor: "#F1F1F1",
+    }
 })

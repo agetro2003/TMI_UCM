@@ -1,5 +1,7 @@
 import { Button, StyleSheet, Text, View } from "react-native";
-import { Link, Stack, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
+
+
 
 export default function Hello() {
     const router = useRouter();
