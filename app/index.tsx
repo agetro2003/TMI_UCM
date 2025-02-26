@@ -1,47 +1,19 @@
-import { StyleSheet, Text, View } from "react-native";
-import { Link, Stack } from "expo-router";
+import { Button, StyleSheet, Text, View } from "react-native";
+import { Link, Stack, useRouter } from "expo-router";
 
 export default function Hello() {
+    const router = useRouter();
     return (
 
 
         <View style={styles.container}>
 
-        <Stack.Screen
-         options={{
-          title: 'My home',
-          headerStyle: { backgroundColor: '#f4511e' },
-          headerTintColor: '#fff',
-          headerTitleStyle: { fontWeight: 'bold' },
-        }}/>
-
-
-
         <Text>Hello, world!</Text>
 
-        <Link style={styles.button} href={{
-          pathname: "/pages/agregarFacturas",
-        }}>
-          Agregar facturas
-        </Link>
-
-        <Link style={styles.button}  href={{
-          pathname: "/pages/verFacturas",
-        }}>
-          Ver facturas
-        </Link>
-
-        <Link style={styles.button}  href={{
-          pathname: "/pages/verInformes",
-        }}>
-          Ver informes
-        </Link>
-
-        <Link style={styles.button}  href={{
-          pathname: "/pages/realizarComparacion",
-        }}>
-          Ver informes
-        </Link>
+        <Button title="Agregar facturas" onPress={() => router.push("/agregarFacturas")} />
+        <Button title="Ver facturas" onPress={() => router.push("/verFacturas")} />
+        <Button title="Ver informes" onPress={() => router.push("/verInformes")} />
+        <Button title="Realizar comparación" onPress={() => router.push("/realizarComparacion")} />
 
         </View>
 

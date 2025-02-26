@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { launchImageLibrary } from "react-native-image-picker";
 
-export default function Page1 () {
+export default function AgregarFacturas () {
     const [image, setImage] = useState<string | null>(null);
 
     const imagenGaleria = async () => {
@@ -18,17 +18,7 @@ export default function Page1 () {
     return (
         <View style={styles.container}>
         <Text>Agregar facturas</Text>
-        <Link style={styles.button} href={{
-            pathname: "/pages/realizarComparacion",
-        }}>
-            <Text>Go to page 2</Text>
-        </Link>
-        <Link style={styles.button} href={{
-            pathname: "/",
-        }}>
-            <Text>Go to index {image}</Text></Link>
 
-       
        
         <Text style={styles.button} onPress={imagenGaleria}>Buscar foto</Text>
 
