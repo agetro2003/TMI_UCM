@@ -1,22 +1,47 @@
-import { Button, StyleSheet, Text, View } from "react-native";
+import { Button, Image, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
-
+import IndexButtons from "@/components/IndexButtons";
 
 
 export default function Hello() {
+ 
+
     const router = useRouter();
+
+    const buttonsInfo = [
+      {
+      title: "Agregar facturas",
+      image: require(`@/assets/images/facturaDibujada.png`),
+      description: "Agrega informacion de facturas mediante una foto", 
+      onPress: () => router.push("/agregarFacturas"),
+  },
+      {
+      title: "Ver facturas",
+      image: require(`@/assets/images/facturaDibujada.png`),
+      description: "Visualiza las facturas que has agregado",
+      onPress: () => router.push("/verFacturas"),
+  },
+      {
+      title: "Ver informes",
+      image: require(`@/assets/images/facturaDibujada.png`),
+      description: "Visualiza los informes de tus facturas",
+      onPress: () => router.push("/verInformes"),
+  },
+      {
+      title: "Realizar comparación",
+      image: require(`@/assets/images/facturaDibujada.png`),
+      description: "Realiza una comparación entre facturas",
+      onPress: () => router.push("/realizarComparacion"),
+      }
+
+];
+
     return (
 
 
         <View style={styles.container}>
 
-        <Text>Hello, world!</Text>
-
-        <Button title="Agregar facturas" onPress={() => router.push("/agregarFacturas")} />
-        <Button title="Ver facturas" onPress={() => router.push("/verFacturas")} />
-        <Button title="Ver informes" onPress={() => router.push("/verInformes")} />
-        <Button title="Realizar comparación" onPress={() => router.push("/realizarComparacion")} />
-
+        <IndexButtons buttonsInfo={buttonsInfo} />
         </View>
 
   );

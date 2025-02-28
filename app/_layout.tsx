@@ -1,7 +1,8 @@
 import { Stack } from "expo-router";
-
+import {SQLiteProvider} from 'expo-sqlite';
 export default function Layout() {
   return (
+    <SQLiteProvider databaseName="facturas.db">
     <Stack>
         <Stack.Screen 
             name="index" 
@@ -39,5 +40,6 @@ export default function Layout() {
         }}
       />
     </Stack>
+    </SQLiteProvider>
   );
 }

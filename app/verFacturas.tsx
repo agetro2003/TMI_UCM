@@ -1,8 +1,27 @@
 import { Link } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
+import { useSQLiteContext } from "expo-sqlite";
+import { useEffect } from "react";
 
 export default function VerFacturas () {
+    const db = useSQLiteContext();
+
+    const getFacturas = async () => {
+        try {
+            const facturas = await db.getAllAsync("SELECT * FROM facturas;");
+            const productos = await db.getAllAsync("SELECT * FROM productos;");
+            console.log("Productos", productos);
+            console.log("Facturas", facturas);
+        } catch (error) {
+            console.log("Error al obtener facturas", error);
+        }
+    }
+
+    useEffect(() => {
+        getFacturas();
+    }, []);
     return (
+
         <View style={styles.container}>
         <Text>Page 2</Text>
       
