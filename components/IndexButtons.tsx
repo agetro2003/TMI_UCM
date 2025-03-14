@@ -1,63 +1,65 @@
-import { Image, StyleSheet, Text, TouchableHighlight, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function IndexButtons({buttonsInfo}: {buttonsInfo: {title: string, image: any, description: string, onPress: () => void}[]}) {
-
-    return(
-<View style={style.container}>
-        {buttonsInfo.map((buttonInfo, index) => (
-          <TouchableHighlight activeOpacity={0} style={style.touchable} key={index} onPress={buttonInfo.onPress} >
-            <View style={style.touchableContainer}> 
-            <View style={style.textContainer}>
-            <Text style={style.title}> 
-                {buttonInfo.title}
-            </Text>
-            <Text style={style.description}>{buttonInfo.description}</Text>
-            </View>
-            <Image style={style.image}   source={buttonInfo.image}
-            />
-            </View>
-          </TouchableHighlight>
-        ))}
-      </View>
-    )
+    return (
+        <View style={styles.container}>
+            {buttonsInfo.map((buttonInfo, index) => (
+                <TouchableOpacity style={styles.button} key={index} onPress={buttonInfo.onPress} activeOpacity={0.7}>
+                    <View style={styles.content}>
+                        <View style={styles.textContainer}>
+                            <Text style={styles.title}>{buttonInfo.title}</Text>
+                            <Text style={styles.description}>{buttonInfo.description}</Text>
+                        </View>
+                        <Image style={styles.image} source={buttonInfo.image} />
+                    </View>
+                </TouchableOpacity>
+            ))}
+        </View>
+    );
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
     container: {
         flex: 1,
-        height: "90%",
+        justifyContent: "space-evenly",
         width: "100%",
-        justifyContent: "space-around",
         alignItems: "center",
+        paddingVertical: 20,
     },
-    touchable: {
-        backgroundColor: "lightgrey",
-        borderRadius: 10,
-    },
-    touchableContainer: {
+    button: {
         width: "90%",
+        backgroundColor: "#fff",
+        borderRadius: 15,
+        padding: 25,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        elevation: 5,
+        marginBottom: 15,
+    },
+    content: {
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-around",
-        padding: 10,
+        justifyContent: "space-between",
     },
-    title: {
-        marginBottom: 15,
-        fontSize: 20,
-        fontWeight: "bold",
-    }, 
-    description: {
-        fontSize: 15,
-    }, 
     textContainer: {
         flex: 1,
-        justifyContent: "space-between",
-        alignItems: "flex-start",
         marginRight: 10,
     },
+    title: {
+        fontSize: 18,
+        fontWeight: "bold",
+        color: "#333",
+        marginBottom: 5,
+    },
+    description: {
+        fontSize: 14,
+        color: "#666",
+    },
     image: {
-        width: 100,
-        height: 100,
-    }
-
-})
+        width: 80,
+        height: 80,
+        resizeMode: "contain",
+    },
+});
