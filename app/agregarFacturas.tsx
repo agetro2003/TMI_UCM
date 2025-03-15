@@ -2,9 +2,68 @@ import SelectImage from "@/components/SelectImage";
 import { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { useSQLiteContext } from "expo-sqlite";
+import { AnalyzeExpenseCommand, AnalyzeExpenseCommandOutput, TextractClient } from "@aws-sdk/client-textract";
+import * as FileSystem from "expo-file-system";
+import "react-native-get-random-values"
 export default function AgregarFacturas () {
     const [image, setImage] = useState<string | null>(null);
-    const db = useSQLiteContext();
+    const [imageBuffer, setImageBuffer] = useState<string | ArrayBuffer | null>(null);
+    const client = new TextractClient({
+         region: "eu-west-3", 
+        credentials: {
+            accessKeyId: process.env.EXPO_PUBLIC_ACCESS_KEY_ID as string,
+            secretAccessKey: process.env.EXPO_PUBLIC_SECRET_ACCESS_KEY as string,
+        },
+        });
+
+
+const getValueFromResponse = (response: AnalyzeExpenseCommandOutput, type: string) => {
+    let value = "";
+    response.ExpenseDocuments!![0].SummaryFields!!.forEach(element => {
+        if (element.Type?.Text == type) {
+            value = element.ValueDetection?.Text!!;
+        }
+    });
+    return value;
+};
+
+const base64toUint8Array = (base64: string) => {
+    const binaryString = window.atob(base64);
+    const binaryLen = binaryString.length;
+    const bytes = new Uint8Array(binaryLen);
+    for (let i = 0; i < binaryLen; i++) {
+        const ascii = binaryString.charCodeAt(i);
+        bytes[i] = ascii;
+    }
+    return bytes;
+};
+
+// analyze invoice and receipt images
+    const analyzeImage = async (image: string) => {
+        try {
+           // Leer la imagen y convertirla a Base64
+           const base64 = await FileSystem.readAsStringAsync(image, { encoding: 'base64' });
+            const imageBuffer = base64toUint8Array(base64);
+           // Configurar los parámetros de la solicitud a AWS Textract
+           const params = {
+               Document: { Bytes: imageBuffer },
+           };
+                
+            const eExpense = new AnalyzeExpenseCommand(params);
+            const response = await client.send(eExpense);
+            let establecimiento = getValueFromResponse(response, "VENDOR_NAME");
+            let fecha = getValueFromResponse(response, "INVOICE_RECEIPT_DATE");
+            let total = getValueFromResponse(response, "TOTAL");
+            let address = getValueFromResponse(response, "ADDRESS_BLOCK");
+            
+            console.log("Response", { establecimiento, fecha, total, address });
+        } catch (error) {
+            console.log("Error al analizar imagen", error);
+        }
+    }
+
+
+    /*const db = useSQLiteContext();
     let fakeFactura = {
         fecha: "2022-01-01",
         productos:
@@ -42,21 +101,24 @@ export default function AgregarFacturas () {
             );
             console.log("Tabla productos creada");
             await db.execAsync(
-                `INSERT INTO facturas (fecha, establecimiento) VALUES ('${fakeFactura.fecha}', '${fakeFactura.establecimiento}');`,
+                INSERT INTO facturas (fecha, establecimiento) VALUES ('${fakeFactura.fecha}', '${fakeFactura.establecimiento}');,
             );
             console.log("Factura insertada");
             await db.execAsync(
-                `INSERT INTO productos (factura_id, nombre, precio, cantidad) VALUES (${1}, '${fakeFactura.productos[0].nombre}', ${fakeFactura.productos[0].precio}, '${fakeFactura.productos[0].cantidad});`,
+                INSERT INTO productos (factura_id, nombre, precio, cantidad) VALUES (${1}, '${fakeFactura.productos[0].nombre}', ${fakeFactura.productos[0].precio}, '${fakeFactura.productos[0].cantidad});,
             )
             console.log("Factura insertada");
         } catch (error) {
             console.log("Error al insertar factura", error);
         }
         }
-    }
+    }*/
     useEffect(() => {
         console.log("Insertando factura");
-        insertFactura();
+        if (image) {
+            analyzeImage(image);
+        }
+        //insertFactura();
 
     }, [image]);
 
