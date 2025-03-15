@@ -8,14 +8,14 @@ import "react-native-get-random-values"
 export default function AgregarFacturas () {
     const [image, setImage] = useState<string | null>(null);
     const [imageBuffer, setImageBuffer] = useState<string | ArrayBuffer | null>(null);
- /*   const client = new TextractClient({
+    const client = new TextractClient({
          region: "eu-west-3", 
         credentials: {
-            accessKeyId: accessKeyId,
-            secretAccessKey: secretAccessKey,
+            accessKeyId: process.env.EXPO_PUBLIC_ACCESS_KEY_ID as string,
+            secretAccessKey: process.env.EXPO_PUBLIC_SECRET_ACCESS_KEY as string,
         },
         });
-*/
+
 
 const getValueFromResponse = (response: AnalyzeExpenseCommandOutput, type: string) => {
     let value = "";
