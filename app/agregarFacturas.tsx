@@ -27,6 +27,35 @@ const getValueFromResponse = (response: AnalyzeExpenseCommandOutput, type: strin
     return value;
 };
 
+const getFieldsFromLineItem = (LineItems: any[], type: string) => {
+    let value = "";
+    LineItems.forEach(element => {
+        if (element.Type?.Text == type) {
+            value = element.ValueDetection?.Text!!;
+        }
+    }
+    );
+    
+   
+    return value;
+}
+
+const getItemsFromResponse = (response: AnalyzeExpenseCommandOutput) => {
+    let items = [] as any;
+    response.ExpenseDocuments!![0].LineItemGroups!![0].LineItems!!.forEach(element => {
+        let lineItems = element.LineItemExpenseFields!!;
+        let item = {
+            name: getFieldsFromLineItem(lineItems, "ITEM"),
+            price: getFieldsFromLineItem(lineItems, "PRICE"),
+            quantity: getFieldsFromLineItem(lineItems, "QUANTITY"),
+        };
+        items.push(item);
+       
+        
+    });
+    return items;
+};
+
 const base64toUint8Array = (base64: string) => {
     const binaryString = window.atob(base64);
     const binaryLen = binaryString.length;
@@ -55,8 +84,9 @@ const base64toUint8Array = (base64: string) => {
             let fecha = getValueFromResponse(response, "INVOICE_RECEIPT_DATE");
             let total = getValueFromResponse(response, "TOTAL");
             let address = getValueFromResponse(response, "ADDRESS_BLOCK");
+            let items = getItemsFromResponse(response);
             
-            console.log("Response", { establecimiento, fecha, total, address });
+            console.log("Response", { establecimiento, fecha, total, address, items });
         } catch (error) {
             console.log("Error al analizar imagen", error);
         }
