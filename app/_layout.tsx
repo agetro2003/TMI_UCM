@@ -3,12 +3,13 @@ import {SQLiteProvider} from 'expo-sqlite';
 export default function Layout() {
   return (
     <SQLiteProvider databaseName="facturas.db">
+     
     <Stack>
         <Stack.Screen 
             name="index" 
             options={{ title: "Inicio", headerShown: true }}
             />
-      <Stack.Screen name="agregarFacturas"
+      <Stack.Screen name="agregarFactura/agregarFacturas"
         options={{
           title: 'Agregar facturas',
           headerShown: true,
@@ -36,9 +37,20 @@ export default function Layout() {
           title: 'Realizar comparación',
           headerShown: true,
           headerBackVisible: true,
-
         }}
+        
       />
+       
+        <Stack.Screen name="agregarFactura/formulario"
+        options={
+          {
+            title: 'Confirme los datos',
+            headerShown: true,
+            headerBackVisible: true,
+          }
+        }
+        />
+      
     </Stack>
     </SQLiteProvider>
   );

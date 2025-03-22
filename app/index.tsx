@@ -13,7 +13,7 @@ export default function Hello() {
       title: "Agregar facturas",
       image: require(`@/assets/images/agregarFac_Icon.png`),
       description: "Agrega informacion de facturas mediante una foto", 
-      onPress: () => router.push("/agregarFacturas"),
+      onPress: () => router.push("../agregarFactura/agregarFacturas"),
   },
       {
       title: "Ver facturas",

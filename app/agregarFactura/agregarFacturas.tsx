@@ -6,10 +6,14 @@ import { AnalyzeExpenseCommand, AnalyzeExpenseCommandOutput, TextractClient } fr
 import * as FileSystem from "expo-file-system";
 import "react-native-get-random-values"
 import { Icon } from "@rneui/themed";
+import { useRouter } from "expo-router";
+
 export default function AgregarFacturas () {
     const [image, setImage] = useState<string | null>(null);
     const [imageBuffer, setImageBuffer] = useState<string | ArrayBuffer | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
+    
+    const router = useRouter();
 
     const client = new TextractClient({
          region: "eu-west-3", 
@@ -150,14 +154,14 @@ const base64toUint8Array = (base64: string) => {
         }
     }*/
     useEffect(() => {
-
+        if (!image) return;
         console.log("Insertando factura");
         
-        if (image) {
+       /* if (image) {
             analyzeImage(image);
-        }
+        }*/
         //insertFactura();
-      
+        router.push("../agregarFactura/formulario");
 
     }, [image]);
 
