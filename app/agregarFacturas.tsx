@@ -1,13 +1,16 @@
 import SelectImage from "@/components/SelectImage";
 import { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View, ActivityIndicator, StatusBar } from "react-native";
 import { useSQLiteContext } from "expo-sqlite";
 import { AnalyzeExpenseCommand, AnalyzeExpenseCommandOutput, TextractClient } from "@aws-sdk/client-textract";
 import * as FileSystem from "expo-file-system";
 import "react-native-get-random-values"
+import { Icon } from "@rneui/themed";
 export default function AgregarFacturas () {
     const [image, setImage] = useState<string | null>(null);
     const [imageBuffer, setImageBuffer] = useState<string | ArrayBuffer | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+
     const client = new TextractClient({
          region: "eu-west-3", 
         credentials: {
@@ -69,6 +72,8 @@ const base64toUint8Array = (base64: string) => {
 
 // analyze invoice and receipt images
     const analyzeImage = async (image: string) => {
+        setLoading(true);
+
         try {
            // Leer la imagen y convertirla a Base64
            const base64 = await FileSystem.readAsStringAsync(image, { encoding: 'base64' });
@@ -90,6 +95,7 @@ const base64toUint8Array = (base64: string) => {
         } catch (error) {
             console.log("Error al analizar imagen", error);
         }
+        setLoading(false);
     }
 
 
@@ -144,14 +150,27 @@ const base64toUint8Array = (base64: string) => {
         }
     }*/
     useEffect(() => {
+
         console.log("Insertando factura");
+        
         if (image) {
             analyzeImage(image);
         }
         //insertFactura();
+      
 
     }, [image]);
 
+    if (loading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#0000ff" />
+               
+                <Icon name="receipt" type="font-awesome-5" color="black" size={50} />
+                <Text>Procesando imagen...</Text>
+            </View>
+        );
+    }
     return (
         <View style={styles.container}>
         <Text style={styles.headerText}>Seleccione una imagen para procesar</Text>
@@ -181,5 +200,12 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "black",
         backgroundColor: "#F1F1F1",
-    }
+    },
+    loadingContainer: {
+        flex: 1,
+        backgroundColor: "#F5F5F5",
+        paddingTop: StatusBar.currentHeight,
+        justifyContent: "center",
+        alignItems: "center",
+    },
 })
