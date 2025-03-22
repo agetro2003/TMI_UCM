@@ -12,7 +12,6 @@ export default function AgregarFacturas () {
     const [image, setImage] = useState<string | null>(null);
     const [imageBuffer, setImageBuffer] = useState<string | ArrayBuffer | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
-    
     const router = useRouter();
 
     const client = new TextractClient({
@@ -95,7 +94,15 @@ const base64toUint8Array = (base64: string) => {
             let address = getValueFromResponse(response, "ADDRESS_BLOCK");
             let items = getItemsFromResponse(response);
             
-            console.log("Response", { establecimiento, fecha, total, address, items });
+           /* const receiptData = { establecimiento: "ds", fecha: "ds", total: "fsd", address:"as", items: [
+                { name: "Producto 1", price: 100, quantity: 1 },
+                { name: "Producto 2", price: 200, quantity: 2 },
+            ] };*/
+            const receiptData = { establecimiento, fecha, total, address, items };
+            router.push({
+                pathname: "../agregarFactura/formulario",
+                params: { receiptData: JSON.stringify(receiptData) }, // Convertir a string
+            });
         } catch (error) {
             console.log("Error al analizar imagen", error);
         }
@@ -157,11 +164,11 @@ const base64toUint8Array = (base64: string) => {
         if (!image) return;
         console.log("Insertando factura");
         
-       /* if (image) {
+        if (image) {
             analyzeImage(image);
-        }*/
+        }
         //insertFactura();
-        router.push("../agregarFactura/formulario");
+        
 
     }, [image]);
 
