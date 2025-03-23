@@ -50,12 +50,24 @@ const getItemsFromResponse = (response: AnalyzeExpenseCommandOutput) => {
     let items = [] as any;
     response.ExpenseDocuments!![0].LineItemGroups!![0].LineItems!!.forEach(element => {
         let lineItems = element.LineItemExpenseFields!!;
-        let item = {
-            name: getFieldsFromLineItem(lineItems, "ITEM"),
-            price: getFieldsFromLineItem(lineItems, "PRICE"),
-            quantity: getFieldsFromLineItem(lineItems, "QUANTITY"),
-        };
-        items.push(item);
+        if(getFieldsFromLineItem(lineItems, "UNIT_PRICE")){
+            let item = {
+                name: getFieldsFromLineItem(lineItems, "ITEM"),
+                price: getFieldsFromLineItem(lineItems, "PRICE"),
+                quantity: getFieldsFromLineItem(lineItems, "QUANTITY"),
+                unit_price: getFieldsFromLineItem(lineItems, "UNIT_PRICE"),
+            };
+            items.push(item);
+        }
+        else{
+            let item = {
+                name: getFieldsFromLineItem(lineItems, "ITEM"),
+                price: getFieldsFromLineItem(lineItems, "PRICE"),
+                quantity: getFieldsFromLineItem(lineItems, "QUANTITY"),
+            };
+            items.push(item);
+        }
+        
        
         
     });
