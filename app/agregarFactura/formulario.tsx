@@ -11,88 +11,56 @@ const {receiptData} = useLocalSearchParams()
 const parsedData = receiptData ? JSON.parse(receiptData as string) : {};
 const [formData, setFormData] = useState(parsedData)
 const router = useRouter();
-console.log(parsedData)
-/*
+//console.log(parsedData)
+
 const db = useSQLiteContext();
 
 const insertReceipt = async() => {
     try {
 
-      await db.execAsync(
+      const resultEstablecimiento = await db.runAsync(
         ` 
-      CREATE TABLE IF NOT EXISTS Establecimiento (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      nombre TEXT
-      );
-        `
-    );
-
-      await db.execAsync(
-          ` 
-        CREATE TABLE IF NOT EXISTS Factura (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        establecimiento INTEGER,
-        fecha TEXT,
-        total REAL,
-        address TEXT,
-        FOREIGN KEY (establecimiento) REFERENCES establecimiento (id)
-        );
-          `
-      );
-      
-      await db.execAsync(
-        `
-        CREATE TABLE IF NOT EXISTS Productos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        price_per_unit REAL,
-        UNIQUE(name, price_per_unit)
-      );
-        `);
-      await db.execAsync(
-        `
-        CREATE TABLE IF NOT EXISTS Factura_Productos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        factura_id INTEGER,
-        producto_id INTEGER,
-        quantity INTEGER,
-        price REAL
-        FOREIGN KEY (factura_id) REFERENCES facturas(id),
-        FOREIGN KEY (producto_id) REFERENCES productos(id)
-      );
-      `
-      );
-      console.log("Tablas creadas");
-      
+        INSERT OR IGNORE INTO Establecimientos (nombre) 
+        VALUES (?);
+        `, [formData.establecimiento]
+      );  
+      console.log("Establecimiento insertado: \n", resultEstablecimiento);
+      // ver estructura de la tabla Facturas
+     // const tablaFacturas = await db.getAllAsync("PRAGMA table_info(Facturas);");
+      //console.log("Estructura de la tabla Facturas: \n", tablaFacturas);
       const resultFactura = await db.runAsync(
         `
-        INSERT INTO facturas (establecimiento, fecha, total, address) 
-        VALUES (${formData.establecimiento}, ${formData.fecha}, 
-        ${formData.total}, ${formData.address});
-        `
+        INSERT INTO Facturas (establecimiento, fecha, total, address) 
+        VALUES (?, ?, ?, ?);
+        `, [resultEstablecimiento.lastInsertRowId, formData.fecha, formData.total, formData.address]
       );
+      console.log("Factura insertada: \n", resultFactura);
       
       formData.items.forEach( async(item: any) => {
         const pricePerUnit = item.unit_price ? item.unit_price : item.price / item.quantity;
 
-        await db.runAsync(
+        const resultItem = await db.runAsync(
           `
-           INSERT OR IGNORE INTO productos (name, price_per_unit) 
-           VALUES (${item.name}, ${pricePerUnit});,
-          `
+           INSERT OR IGNORE INTO Productos (name, price_per_unit) 
+           VALUES (?, ?);,
+          `, [item.name, pricePerUnit]
         );  
-
-        
-
-        
+        console.log("Producto insertado: \n", resultItem);
+        const resultFacturaItem = await db.runAsync(
+          `
+          INSERT INTO Factura_productos (factura_id, producto_id, quantity, price)
+          VALUES (?, ?, ?, ?);
+          `, [resultFactura.lastInsertRowId, resultItem.lastInsertRowId, item.quantity, item.price]
+        );
+        console.log("Producto de factura insertado: \n", resultFacturaItem);
       });
 
 
     } catch (error) {
-      
+      console.log("Error en la creación de tablas o en insercion de datos: ", error);
     }
 }
-*/
+
 const handleInputChange = (key: string, e: string) => {
 setFormData({
 ...formData,
@@ -116,6 +84,7 @@ const showConfirmation = () => {
 const confirmReceipt = ()=>{
 
   console.log("confirmado");
+  insertReceipt();
   router.push("../..");
   
 }

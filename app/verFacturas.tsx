@@ -10,8 +10,12 @@ export default function VerFacturas () {
         try {
             const facturas = await db.getAllAsync("SELECT * FROM facturas;");
             const productos = await db.getAllAsync("SELECT * FROM productos;");
+            const establecimientos = await db.getAllAsync("SELECT * FROM establecimientos;");
+            const facturaProductos = await db.getAllAsync("SELECT * FROM factura_productos;");
+            console.log("Establecimientos", establecimientos);
             console.log("Productos", productos);
             console.log("Facturas", facturas);
+            console.log("FacturaProductos", facturaProductos);
         } catch (error) {
             console.log("Error al obtener facturas", error);
         }
