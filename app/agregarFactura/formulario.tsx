@@ -37,8 +37,15 @@ const insertReceipt = async() => {
       console.log("Factura insertada: \n", resultFactura);
       
       formData.items.forEach( async(item: any) => {
-        const pricePerUnit = item.unit_price ? item.unit_price : item.price / item.quantity;
+        
+        item.price = item.price.split(" ")[0];
+        item.price =item.price.replace(",", ".");
+        console.log(item.unit_price);
+        console.log(Number(item.price));
+        console.log(Number(item.quantity));
 
+        const pricePerUnit = item.unit_price ? item.unit_price : Number(item.price) / Number(item.quantity);
+        console.log(pricePerUnit);
         const resultItem = await db.runAsync(
           `
            INSERT OR IGNORE INTO Productos (name, price_per_unit) 

@@ -1,11 +1,12 @@
 import { Link } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { useSQLiteContext } from "expo-sqlite";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import MenuButtons from "@/components/MenuButton";
 
 export default function VerFacturas () {
     const db = useSQLiteContext();
-
+    const [data, setData]= useState<any[]>([])
     const getFacturas = async () => {
         try {
             const facturas = await db.getAllAsync("SELECT * FROM facturas;");
@@ -21,15 +22,29 @@ export default function VerFacturas () {
         }
     }
 
+    const getDatosLista = async() => {
+        try {
+            const facturas_establecimientos= await db.getAllAsync(`
+                SELECT e.nombre, f.id, f.fecha, f.total 
+                FROM facturas as f 
+                INNER JOIN establecimientos as e on e.id=f.establecimiento;`);
+            console.log("Opciones menu", facturas_establecimientos);
+            setData(facturas_establecimientos);
+        } catch (error) {
+            console.log("Error al obtener facturas", error);
+        }
+    }
+
     useEffect(() => {
         getFacturas();
+        getDatosLista();
     }, []);
     return (
 
         <View style={styles.container}>
         <Text>Page 2</Text>
       
-
+<MenuButtons buttonsInfo={data}></MenuButtons>
             <Link style={styles.button} href="..">
                 Atrás
             </Link>

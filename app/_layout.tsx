@@ -16,7 +16,7 @@ export default function Layout() {
           headerBackVisible: true,
         }}
       />
-      <Stack.Screen name="verFacturas"
+      <Stack.Screen name="verFacturas/verFacturas"
         options={{
           title: 'Ver facturas',
           headerShown: true,
@@ -42,6 +42,16 @@ export default function Layout() {
       />
        
         <Stack.Screen name="agregarFactura/formulario"
+        options={
+          {
+            title: 'Confirme los datos',
+            headerShown: true,
+            headerBackVisible: true,
+          }
+        }
+        />
+
+      <Stack.Screen name="verFactura/formulario"
         options={
           {
             title: 'Confirme los datos',
