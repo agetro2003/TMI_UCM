@@ -51,10 +51,10 @@ export default function Layout() {
         }
         />
 
-      <Stack.Screen name="verFactura/formulario"
+      <Stack.Screen name="verFacturas/factura"
         options={
           {
-            title: 'Confirme los datos',
+            title: 'Factura',
             headerShown: true,
             headerBackVisible: true,
           }

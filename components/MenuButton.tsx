@@ -1,10 +1,23 @@
+import { useRouter } from "expo-router";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-export default function MenuButtons({buttonsInfo}: {buttonsInfo: {nombre: string, total: string|number, fecha: string}[]}) {
+export default function MenuButtons({buttonsInfo}: {buttonsInfo: {id: number, nombre: string, total: string|number, fecha: string}[]}) {
+    
+    const router = useRouter();
+    const onPress = (id : number) => {
+        router.push({
+            pathname: "../verFacturas/factura",
+            params: {
+                facturaId: id,
+            }
+        });
+    }
     return (
         <View style={styles.container}>
             {buttonsInfo.map((buttonInfo, index) => (
-                <TouchableOpacity style={styles.button} key={index}  activeOpacity={0.7}>
+                <TouchableOpacity 
+                onPress={() => onPress(buttonInfo.id)}
+                style={styles.button} key={index}  activeOpacity={0.7}>
                     <View style={styles.content}>
                         <View style={styles.textContainer}>
                             <Text style={styles.title}>{buttonInfo.nombre}</Text>
