@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Dimensions } from "react-native";
+import { ScrollView, View, Text, StyleSheet, Dimensions } from "react-native";
 import { PieChart } from "react-native-chart-kit";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -38,6 +38,7 @@ const data = factura.ITEMS.map((item, index) => {
 
 export default function RealizarComparacion() {
     return (
+        <ScrollView style={{ flex: 1, padding:10}}  contentContainerStyle={{ paddingBottom: 20 }}>
         <View style={styles.container}>
             {/* Fondo degradado superior */}
             <LinearGradient colors={["#332b80", "#7a74b8"]} style={styles.header}>
@@ -89,6 +90,7 @@ export default function RealizarComparacion() {
                 ))}
             </View>
         </View>
+        </ScrollView>
     );
 }
 
