@@ -24,7 +24,7 @@ export default function Layout() {
 
         }}
       />
-      <Stack.Screen name="verInformes"
+      <Stack.Screen name="verInforme/verInformes"
         options={{
           title: 'Ver informes',
           headerShown: true,
@@ -32,13 +32,22 @@ export default function Layout() {
 
         }}
       />
-      <Stack.Screen name="realizarComparacion"
+      <Stack.Screen name="verComparacion/opcionComparacionForm"
         options={{
-          title: 'Realizar comparación',
+          title: 'Configurar comparación',
           headerShown: true,
           headerBackVisible: true,
         }}
         
+      />
+
+      <Stack.Screen name="verComparacion/realizarComparacion"
+      options={
+        {
+          title: 'Ver comparativa',
+          headerShown: true,
+          headerBackVisible: true,
+        }}
       />
        
         <Stack.Screen name="agregarFactura/formulario"
@@ -55,6 +64,16 @@ export default function Layout() {
         options={
           {
             title: 'Factura',
+            headerShown: true,
+            headerBackVisible: true,
+          }
+        }
+        />
+
+      <Stack.Screen name="verInforme/informe"
+        options={
+          {
+            title: 'Informe',
             headerShown: true,
             headerBackVisible: true,
           }

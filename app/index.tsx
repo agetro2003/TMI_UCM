@@ -149,13 +149,13 @@ export default function Hello() {
       title: "Ver informes",
       image: require(`@/assets/images/verInfo_Icon.png`),
       description: "Visualiza los informes de tus facturas",
-      onPress: () => router.push("/verInformes"),
+      onPress: () => router.push("../verInforme/verInformes"),
   },
       {
       title: "Realizar comparación",
       image: require(`@/assets/images/hacerComp_Icon.png`),
       description: "Realiza una comparación entre facturas",
-      onPress: () => router.push("/realizarComparacion"),
+      onPress: () => router.push("../verComparacion/opcionComparacionForm"),
       }
 
 ];

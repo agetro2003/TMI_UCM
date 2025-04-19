@@ -1,12 +1,13 @@
 import SelectImage from "@/components/SelectImage";
 import { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, View, ActivityIndicator, StatusBar } from "react-native";
+import { StyleSheet, Text, View, ActivityIndicator, StatusBar } from "react-native";
 import { useSQLiteContext } from "expo-sqlite";
 import { AnalyzeExpenseCommand, AnalyzeExpenseCommandOutput, TextractClient } from "@aws-sdk/client-textract";
 import * as FileSystem from "expo-file-system";
 import "react-native-get-random-values"
 import { Icon } from "@rneui/themed";
 import { useRouter } from "expo-router";
+import { Image } from "expo-image";
 
 export default function AgregarFacturas () {
     const [image, setImage] = useState<string | null>(null);
@@ -187,12 +188,15 @@ const base64toUint8Array = (base64: string) => {
     if (loading) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#0000ff" />
-               
-                <Icon name="receipt" type="font-awesome-5" color="black" size={50} />
-                <Text>Procesando imagen...</Text>
+              <Image
+                source={require("@/assets/images/loading_doc.gif")}
+                style={styles.loadingGif}
+                contentFit="contain"
+                priority="high"
+              />
+              <Text style={styles.loadingText}>Procesando imagen</Text>
             </View>
-        );
+          );
     }
     return (
         <View style={styles.container}>
@@ -230,5 +234,15 @@ const styles = StyleSheet.create({
         paddingTop: StatusBar.currentHeight,
         justifyContent: "center",
         alignItems: "center",
+    },
+    loadingGif: {
+        width: 200,
+        height: 200,
+        marginTop: -10,
+        marginBottom: 30,
+        },
+    loadingText: {
+        fontSize: 16,
+        color: "#333",
     },
 })
