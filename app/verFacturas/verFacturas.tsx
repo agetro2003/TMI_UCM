@@ -15,7 +15,7 @@ export default function VerFacturas () {
             const productos = await db.getAllAsync("SELECT * FROM productos;");
             const establecimientos = await db.getAllAsync("SELECT * FROM establecimientos;");
             const facturaProductos = await db.getAllAsync("SELECT * FROM factura_productos;");
-            console.log("Establecimientos", establecimientos);
+          console.log("Establecimientos", establecimientos);
             console.log("Productos", productos);
             console.log("Facturas", facturas);
             console.log("FacturaProductos", facturaProductos);
@@ -29,9 +29,10 @@ export default function VerFacturas () {
             const facturas_establecimientos= await db.getAllAsync(`
                 SELECT e.nombre, f.id, f.fecha, f.total 
                 FROM facturas as f 
-                INNER JOIN establecimientos as e on e.id=f.establecimiento;`);
-            console.log("Opciones menu", facturas_establecimientos);
+                INNER JOIN establecimientos as e on e.id=f.establecimiento;
+                `);
             setData(facturas_establecimientos);
+            console.log("data", facturas_establecimientos);
            
         } catch (error) {
             console.log("Error al obtener facturas", error);
@@ -45,7 +46,6 @@ export default function VerFacturas () {
     return (
 
         <View style={styles.container}>
-        <Text>Page 2</Text>
       
 <MenuButtons buttonsInfo={data}></MenuButtons>
             <Link style={styles.button} href="..">

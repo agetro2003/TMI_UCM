@@ -9,6 +9,7 @@ interface Item {
   quantity: number;
   price: number;
   price_per_unit: number;
+  tag: string;
 }
 
 interface FacturaData {
@@ -56,9 +57,10 @@ export default function Factura() {
           price: string | number;
           name: string;
           price_per_unit: number;
+          tag: string;
         }>(
           `
-          SELECT fp.producto_id, fp.quantity, fp.price, p.name, p.price_per_unit
+          SELECT fp.producto_id, fp.quantity, fp.price, p.name, p.price_per_unit, p.tag
           FROM Factura_Productos fp
           JOIN Productos p ON p.id = fp.producto_id
           WHERE fp.factura_id = ?;
@@ -71,6 +73,7 @@ export default function Factura() {
           quantity: r.quantity,
           price: typeof r.price === 'string' ? parseFloat(r.price.replace(',', '.')) : r.price,
           price_per_unit: r.price_per_unit,
+          tag: r.tag,
         }));
 
         setFactura({
@@ -153,15 +156,17 @@ export default function Factura() {
 
         {/* Productos */}
         <View style={[styles.row, styles.tableHeader]}>
-          <Text style={[styles.label, { flex: 2 }]}>Descripción</Text>
+          <Text style={[styles.label, { flex: 3 }]}>Descripción</Text>
           <Text style={[styles.label, { flex: 1, textAlign: 'center' }]}>Cant.</Text>
-          <Text style={[styles.label, { flex: 1, textAlign: 'right' }]}>Importe (€)</Text>
+          <Text style={[styles.label, { flex: 2, textAlign: 'right' }]}>Importe</Text>
+          <Text style={[styles.label, { flex: 3, textAlign: 'right' }]}>Categoria</Text>
         </View>
         {factura.items.map((item, idx) => (
           <View key={idx} style={styles.itemRow}>
             <Text style={[styles.itemName, { flex: 2 }]}>{item.name}</Text>
             <Text style={[styles.itemQty, { flex: 1, textAlign: 'center' }]}>{item.quantity}</Text>
             <Text style={[styles.itemPrice, { flex: 1 }]}>{item.price.toFixed(2)}€</Text>
+            <Text style={[styles.itemCategory, { flex: 2 }]}>{item.tag}</Text>
           </View>
         ))}
 
@@ -230,7 +235,7 @@ const styles = StyleSheet.create({
   },
   label: {
     color: '#999',
-    fontSize: 14,
+    fontSize: 13,
   },
   divider: {
     height: 1,
@@ -255,6 +260,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'right',
     color: '#333',
+  },
+  itemCategory: {
+    fontSize: 12,
+    color: '#333',
+    textAlign: 'right',
   },
   buttonsContainer: {
     flexDirection: 'row',

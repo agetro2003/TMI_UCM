@@ -11,7 +11,6 @@ export default function SelectImage({setImage }: {setImage: (image: string) => v
             quality: 1,
           });
       
-          console.log(result);
       
           if (!result.canceled) {
             setImage(result.assets[0].uri);
@@ -24,7 +23,6 @@ export default function SelectImage({setImage }: {setImage: (image: string) => v
             quality: 1,
           });
       
-          console.log(result);
       
           if (!result.canceled) {
             setImage(result.assets[0].uri);

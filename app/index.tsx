@@ -23,7 +23,6 @@ export default function Hello() {
     const resetDatabase_Facturas = async () => {
       try{
         await db.execAsync("DROP TABLE IF EXISTS Facturas;");
-        console.log("Facturas dropped");
           
       }
       catch (error) {
@@ -33,7 +32,6 @@ export default function Hello() {
     const resetDatabase_Establecimientos = async () => {
       try{
         await db.execAsync("DROP TABLE IF EXISTS Establecimientos;");
-        console.log("Establecimiento dropped");
       }
       catch (error) {
         console.log(error)
@@ -43,7 +41,6 @@ export default function Hello() {
     const resetDatabase_Factura_Productos = async () => {
       try{
         await db.execAsync("DROP TABLE IF EXISTS Factura_Productos;");
-        console.log("Factura_Productos dropped");
           
       }
       catch (error) {
@@ -53,7 +50,6 @@ export default function Hello() {
     const resetDatabase_Productos = async () => {
         try {
           await db.execAsync("DROP TABLE IF EXISTS Productos;");
-          console.log("Productos dropped");
           console.log("Resetting database...");
         } catch (error) {
           console.log(error)
@@ -99,6 +95,7 @@ export default function Hello() {
               id INTEGER PRIMARY KEY AUTOINCREMENT,
               name TEXT,
               price_per_unit REAL,
+              tag TEXT,
               UNIQUE(name, price_per_unit)
             );
               `);
@@ -115,7 +112,6 @@ export default function Hello() {
             );
             `
             );
-            console.log("Tablas creadas");
             await checkdb();
 
           } catch (error) {

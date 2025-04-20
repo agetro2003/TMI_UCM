@@ -8,6 +8,7 @@ import "react-native-get-random-values"
 import { Icon } from "@rneui/themed";
 import { useRouter } from "expo-router";
 import { Image } from "expo-image";
+import {classifier}  from "@/api/axios"
 
 export default function AgregarFacturas () {
     const [image, setImage] = useState<string | null>(null);
@@ -86,6 +87,8 @@ const base64toUint8Array = (base64: string) => {
     return bytes;
 };
 
+
+
 // analyze invoice and receipt images
     const analyzeImage = async (image: string) => {
         setLoading(true);
@@ -107,10 +110,17 @@ const base64toUint8Array = (base64: string) => {
             let address = getValueFromResponse(response, "ADDRESS_BLOCK");
             let items = getItemsFromResponse(response);
             
-           /* const receiptData = { establecimiento: "ds", fecha: "ds", total: "fsd", address:"as", items: [
-                { name: "Producto 1", price: 100, quantity: 1 },
-                { name: "Producto 2", price: 200, quantity: 2 },
-            ] };*/
+            const namesOfProducts = items.map((item: any) => item.name);
+            const res = await classifier.post(
+                "/categorizar",
+                { nombres: namesOfProducts }
+              );
+              const tags = res.data;
+              items.forEach((item: any, index: number) => {
+                  item.tag = tags[index].tag;
+                });
+                
+   
             const receiptData = { establecimiento, fecha, total, address, items };
             router.push({
                 pathname: "../agregarFactura/formulario",
@@ -122,60 +132,8 @@ const base64toUint8Array = (base64: string) => {
         setLoading(false);
     }
 
-
-    /*const db = useSQLiteContext();
-    let fakeFactura = {
-        fecha: "2022-01-01",
-        productos:
-            [
-                { nombre: "Producto 1", precio: 100, cantidad: 1 },
-                { nombre: "Producto 2", precio: 200, cantidad: 2 },
-            ],
-        establecimiento: "Establecimiento 1",
-    };
-
-    const insertFactura = async () => {
-        if (image) {
-            try{
-            await db.execAsync(
-                [
-                    "CREATE TABLE IF NOT EXISTS facturas (",
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT,",
-                    "fecha TEXT,",
-                    "establecimiento TEXT",
-                    ");",
-                ].join(" ")
-            );
-            console.log("Tabla facturas creada");
-            await db.execAsync(
-                [
-                    "CREATE TABLE IF NOT EXISTS productos (",
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT,",
-                    "factura_id INTEGER,",
-                    "nombre TEXT,",
-                    "precio REAL,",
-                    "cantidad INTEGER,",
-                    "FOREIGN KEY (factura_id) REFERENCES facturas(id)",
-                    ");",
-                ].join(" ")
-            );
-            console.log("Tabla productos creada");
-            await db.execAsync(
-                INSERT INTO facturas (fecha, establecimiento) VALUES ('${fakeFactura.fecha}', '${fakeFactura.establecimiento}');,
-            );
-            console.log("Factura insertada");
-            await db.execAsync(
-                INSERT INTO productos (factura_id, nombre, precio, cantidad) VALUES (${1}, '${fakeFactura.productos[0].nombre}', ${fakeFactura.productos[0].precio}, '${fakeFactura.productos[0].cantidad});,
-            )
-            console.log("Factura insertada");
-        } catch (error) {
-            console.log("Error al insertar factura", error);
-        }
-        }
-    }*/
     useEffect(() => {
         if (!image) return;
-        console.log("Insertando factura");
         
         if (image) {
             analyzeImage(image);

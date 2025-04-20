@@ -6,11 +6,14 @@ type ItemInputProps = {
   price: number;
   onChange: (key: string, value: string, index: number) => void;
   index: number;
+  tag: string;
 };
 
-export default function ItemInput({ name, quantity, price, onChange, index }: ItemInputProps) {
+export default function ItemInput({ name, quantity, price, tag, onChange, index }: ItemInputProps) {
   return (
+
     <View style={styles.container}>
+      <View style={styles.firstRow}>
       <TextInput
         style={[styles.input, styles.nameInput]}
         value={name}
@@ -31,12 +34,21 @@ export default function ItemInput({ name, quantity, price, onChange, index }: It
         onChangeText={(text) => onChange("price", text, index)}
         placeholder="Precio"
       />
+      </View>
+      <View style={styles.secondRow}> 
+        <TextInput
+          style={[styles.input, styles.tagInput]}
+          value={tag}
+          onChangeText={(text) => onChange("tag", text, index)}
+          placeholder="Categoria"
+        />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  firstRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -63,4 +75,20 @@ const styles = StyleSheet.create({
     flex: 2.5, // 25%
     textAlign: "right",
   },
+  tagInput: {
+    flex: 1, // 10%
+    textAlign: "center",
+  },
+  container: {
+    width: "100%",
+    marginBottom: 10,
+  },
+  secondRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  
+ 
 });

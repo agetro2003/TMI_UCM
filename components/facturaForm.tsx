@@ -4,7 +4,6 @@ import { useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useState } from "react";
 import { Alert, Pressable, ScrollView, View, Text, StyleSheet, Dimensions} from "react-native";
-
 export default function FacturaForm(
   {receiptData, isCreating}: {receiptData: {
       id?: number;
@@ -19,6 +18,7 @@ export default function FacturaForm(
         quantity: number;
         price: string | number;
         unit_price?: number; // Añadido para el precio por unidad
+        tag: string;
       }[];
     },
     isCreating: boolean,
@@ -38,7 +38,6 @@ export default function FacturaForm(
         VALUES (?);
         `, [formData.establecimiento]
       );  
-      console.log("Establecimiento insertado: \n", resultEstablecimiento);
       // ver estructura de la tabla Facturas
      // const tablaFacturas = await db.getAllAsync("PRAGMA table_info(Facturas);");
       //console.log("Estructura de la tabla Facturas: \n", tablaFacturas);
@@ -48,32 +47,24 @@ export default function FacturaForm(
         VALUES (?, ?, ?, ?);
         `, [resultEstablecimiento.lastInsertRowId, formData.fecha, formData.total, formData.address]
       );
-      console.log("Factura insertada: \n", resultFactura);
-      
       formData.items.forEach( async(item: any) => {
         
         item.price = item.price.split(" ")[0];
         item.price =item.price.replace(",", ".");
-        console.log(item.unit_price);
-        console.log(Number(item.price));
-        console.log(Number(item.quantity));
 
         const pricePerUnit = item.unit_price ? item.unit_price : Number(item.price) / Number(item.quantity);
-        console.log(pricePerUnit);
         const resultItem = await db.runAsync(
           `
-           INSERT OR IGNORE INTO Productos (name, price_per_unit) 
-           VALUES (?, ?);,
-          `, [item.name, pricePerUnit]
+           INSERT OR IGNORE INTO Productos (name, price_per_unit, tag) 
+           VALUES (?, ?, ?);
+          `, [item.name, pricePerUnit, item.tag]
         );  
-        console.log("Producto insertado: \n", resultItem);
         const resultFacturaItem = await db.runAsync(
           `
           INSERT INTO Factura_productos (factura_id, producto_id, quantity, price)
           VALUES (?, ?, ?, ?);
           `, [resultFactura.lastInsertRowId, resultItem.lastInsertRowId, item.quantity, item.price]
         );
-        console.log("Producto de factura insertado: \n", resultFacturaItem);
       });
 
     } catch (error) {
@@ -130,7 +121,7 @@ export default function FacturaForm(
   const showConfirmation = () => {
     // check if data has changed
     const hasChanged = JSON.stringify(receiptData) !== JSON.stringify(formData);
-    if (!hasChanged) {
+    if (!hasChanged && !isCreating) {
       Alert.alert("No hay cambios", "No se han realizado cambios en los datos.");
       return;
     }
@@ -146,7 +137,6 @@ export default function FacturaForm(
 
   const confirmReceipt = ()=>{
 
-    console.log("confirmado");
     isCreating ? insertReceipt() : updateReceipt();
     router.push("../..");
     
@@ -156,9 +146,6 @@ export default function FacturaForm(
     setFormData((prev: any) => ({
       ...prev,
       items: prev.items?.map((item: any, i: number) => {
-        console.log("i:", i);
-        console.log("index:", index);
-        console.log("item:", item);
   
         if (i === index) {
           return {
@@ -214,6 +201,13 @@ export default function FacturaForm(
             Importe (€)
           </Text>
         </View>
+        <View style={[styles.row, styles.tableHeader]}>
+          <Text style={[styles.label, { flex: 1, textAlign: "center" }]}>
+          Categoría
+          </Text>
+          
+        </View>
+
         {formData.items.map((item, idx) => (
           <ItemInput
             key={idx}
@@ -221,6 +215,7 @@ export default function FacturaForm(
             quantity={item.quantity}
             price={item.price as any}
             index={idx}
+            tag={item.tag}
             onChange={handleItemChange}
           />
         ))}
