@@ -31,13 +31,24 @@ export default function FacturaForm(
 
   const insertReceipt = async() => {
     try {
+      let establecimiento = await db.getAllAsync(
+        `SELECT * FROM Establecimientos WHERE nombre = ?;`, [formData.establecimiento]
+      ) as any[];
+      let establecimientoId
 
-      const resultEstablecimiento = await db.runAsync(
-        ` 
-        INSERT OR IGNORE INTO Establecimientos (nombre) 
-        VALUES (?);
-        `, [formData.establecimiento]
-      );  
+      if (!establecimiento) {
+        const resultEstablecimiento = await db.runAsync(
+          ` 
+          INSERT OR IGNORE INTO Establecimientos (nombre) 
+          VALUES (?);
+          `, [formData.establecimiento]
+        );  
+        establecimientoId = resultEstablecimiento.lastInsertRowId;
+      } else {
+        establecimientoId = establecimiento[0].id;
+      }
+     
+
       // ver estructura de la tabla Facturas
      // const tablaFacturas = await db.getAllAsync("PRAGMA table_info(Facturas);");
       //console.log("Estructura de la tabla Facturas: \n", tablaFacturas);
@@ -45,7 +56,7 @@ export default function FacturaForm(
         `
         INSERT INTO Facturas (establecimiento, fecha, total, address) 
         VALUES (?, ?, ?, ?);
-        `, [resultEstablecimiento.lastInsertRowId, formData.fecha, formData.total, formData.address]
+        `, [establecimientoId, formData.fecha, formData.total, formData.address]
       );
       formData.items.forEach( async(item: any) => {
         
@@ -53,17 +64,31 @@ export default function FacturaForm(
         item.price =item.price.replace(",", ".");
 
         const pricePerUnit = item.unit_price ? item.unit_price : Number(item.price) / Number(item.quantity);
-        const resultItem = await db.runAsync(
-          `
-           INSERT OR IGNORE INTO Productos (name, price_per_unit, tag) 
-           VALUES (?, ?, ?);
-          `, [item.name, pricePerUnit, item.tag]
-        );  
+        const product = await db.getAllAsync(
+          `SELECT * FROM Productos WHERE name = ?;`, [item.name]
+        ) as any[];
+        let productId;
+        if (product.length > 0) {
+          product.forEach(element => {
+            if (element.name === item.name && element.price_per_unit === pricePerUnit) {
+              productId = element.id;
+            }
+          });
+        } else {
+          const resultProduct = await db.runAsync(
+            `
+            INSERT or IGNORE INTO Productos (name, price_per_unit, tag) 
+            VALUES (?, ?, ?);
+            `, [item.name, pricePerUnit, item.tag]
+          );  
+          productId = resultProduct.lastInsertRowId;
+        }
+       
         const resultFacturaItem = await db.runAsync(
           `
           INSERT INTO Factura_productos (factura_id, producto_id, quantity, price)
           VALUES (?, ?, ?, ?);
-          `, [resultFactura.lastInsertRowId, resultItem.lastInsertRowId, item.quantity, item.price]
+          `, [resultFactura.lastInsertRowId, productId, item.quantity, item.price]
         );
       });
 

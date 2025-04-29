@@ -15,7 +15,7 @@ export default function VerFacturas () {
             const productos = await db.getAllAsync("SELECT * FROM productos;");
             const establecimientos = await db.getAllAsync("SELECT * FROM establecimientos;");
             const facturaProductos = await db.getAllAsync("SELECT * FROM factura_productos;");
-          console.log("Establecimientos", establecimientos);
+            console.log("Establecimientos", establecimientos);
             console.log("Productos", productos);
             console.log("Facturas", facturas);
             console.log("FacturaProductos", facturaProductos);
