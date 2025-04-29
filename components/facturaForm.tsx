@@ -72,7 +72,7 @@ export default function FacturaForm(
         let productId: string | number | null = null;
         if (product.length > 0) {
           product.forEach(element => {
-            if (element.name === item.name && element.price_per_unit === pricePerUnit) {
+            if (element.name == item.name && element.price_per_unit == pricePerUnit) {
               productId = element.id;
             }
           });
