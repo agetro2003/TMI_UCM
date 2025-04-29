@@ -13,9 +13,10 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/letSave-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.agetro.letsave"
     },
     "web": {
       "bundler": "metro",
