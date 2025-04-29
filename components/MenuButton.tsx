@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View, ScrollView } from "react-native";
 
 export default function MenuButtons({buttonsInfo}: {buttonsInfo: {id: number, nombre: string, total: string|number, fecha: string}[]}) {
     
@@ -13,6 +13,7 @@ export default function MenuButtons({buttonsInfo}: {buttonsInfo: {id: number, no
         });
     }
     return (
+        <ScrollView style={{flex: 1, width: "100%"}} contentContainerStyle={{alignItems: "center"}}>
         <View style={styles.container}>
             {buttonsInfo.map((buttonInfo, index) => (
                 <TouchableOpacity 
@@ -30,6 +31,7 @@ export default function MenuButtons({buttonsInfo}: {buttonsInfo: {id: number, no
                 </TouchableOpacity>
             ))}
         </View>
+        </ScrollView>
     );
 }
 

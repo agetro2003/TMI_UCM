@@ -40,7 +40,7 @@ export default function VerFacturas () {
     }
 
     useEffect(() => {
-        getFacturas();
+      //  getFacturas();
         getDatosLista();
     }, []);
     return (
