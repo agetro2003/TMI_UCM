@@ -9,7 +9,12 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "icon": {
+        "dark":  "./assets/images/letSave-icon.png",
+        "light":  "./assets/images/letSave-icon.png",
+        "tinted":  "./assets/images/letSave-icon.png"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +26,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/letSave-icon.png"
     },
     "plugins": [
       "expo-router",
