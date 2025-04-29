@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useState } from "react";
 import { Alert, Pressable, ScrollView, View, Text, StyleSheet, Dimensions} from "react-native";
+import { Picker } from '@react-native-picker/picker';
 export default function FacturaForm(
   {receiptData, isCreating}: {receiptData: {
       id?: number;
@@ -119,8 +120,10 @@ export default function FacturaForm(
       formData.items.forEach(async (item: any, index: number) => {
           if (item.name !== receiptData.items[index].name || item.quantity !== receiptData.items[index].quantity || item.price !== receiptData.items[index].price) {
               await db.runAsync(
-                  `UPDATE Productos SET name = ?, price_per_unit = ? WHERE id = ?`,
-                  [item.name, item.unit_price? item.unit_price : item.price / item.quantity, receiptData.items[index].id]
+                  `UPDATE Productos SET name = ?, price_per_unit = ?, tag = ? WHERE id = ?;`,
++          [ item.name,
++            item.unit_price ? item.unit_price : item.price / item.quantity,
++            item.tag, receiptData.items[index].id ]
               );
               await db.runAsync(
                   `UPDATE Factura_productos SET quantity = ?, price = ? WHERE factura_id = ? AND producto_id = ?`,
@@ -236,15 +239,37 @@ export default function FacturaForm(
         </View>
 
         {formData.items.map((item, idx) => (
-          <ItemInput
-            key={idx}
-            name={item.name}
-            quantity={item.quantity}
-            price={item.price as any}
-            index={idx}
-            tag={item.tag}
-            onChange={handleItemChange}
-          />
+          <View key={idx} style={{ marginBottom: 20 }}>
+            <ItemInput
+              key={idx}
+              name={item.name}
+              quantity={item.quantity}
+              price={item.price as any}
+              index={idx}
+              tag={item.tag}
+              onChange={handleItemChange}
+              showTagInput={false}
+            />
+            {/* Picker para seleccionar la categoría (tag) */}
+            <View style={[styles.pickerWrapper, { marginTop: -12 }]}>
+              <Picker
+                selectedValue={item.tag}
+                onValueChange={(value) => handleItemChange('tag', value, idx)}
+                mode="dropdown"
+                dropdownIconColor="#333"
+                style={styles.picker}
+                itemStyle={styles.pickerItem}
+              >
+                {/* Si el usuario no abre el picker se mantiene el tag actual */}
+                <Picker.Item label="— Selecciona categoría —" value={item.tag} />
+                <Picker.Item label="Comestibles" value="comestibles" />
+                <Picker.Item label="Ropa" value="ropa" />
+                <Picker.Item label="Higiene" value="higiene" />
+                <Picker.Item label="Electrónica" value="electronica" />
+                <Picker.Item label="Entretenimiento" value="entretenimiento" />
+              </Picker>
+            </View>
+          </View>
         ))}
 
         <View style={styles.divider} />
@@ -333,5 +358,20 @@ const styles = StyleSheet.create({
   saveText: {
     color: "#FFF",
     fontWeight: "600",
+  },
+  pickerWrapper: {
+    borderWidth: 1,
+    borderColor: '#CCC',
+    borderRadius: 8,
+    overflow: 'hidden',
+    height: 50,   
+  },
+  picker: {
+    height: 50,
+    width: '100%',
+  },
+  pickerItem: {
+    height: 50,            // altura de cada elemento
+    fontSize: 12,
   },
 });

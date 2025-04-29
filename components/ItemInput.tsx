@@ -7,9 +7,10 @@ type ItemInputProps = {
   onChange: (key: string, value: string, index: number) => void;
   index: number;
   tag: string;
+  showTagInput?: boolean;
 };
 
-export default function ItemInput({ name, quantity, price, tag, onChange, index }: ItemInputProps) {
+export default function ItemInput({ name, quantity, price, tag, onChange, index, showTagInput = true }: ItemInputProps) {
   return (
 
     <View style={styles.container}>
@@ -35,14 +36,16 @@ export default function ItemInput({ name, quantity, price, tag, onChange, index 
         placeholder="Precio"
       />
       </View>
-      <View style={styles.secondRow}> 
-        <TextInput
-          style={[styles.input, styles.tagInput]}
-          value={tag}
-          onChangeText={(text) => onChange("tag", text, index)}
-          placeholder="Categoria"
-        />
-      </View>
+        {showTagInput && (
+          <View style={styles.secondRow}>
+            <TextInput
+              style={[styles.input, styles.tagInput]}
+              value={tag}
+              onChangeText={(text) => onChange("tag", text, index)}
+              placeholder="Categoria"
+            />
+          </View>
+        )}
     </View>
   );
 }

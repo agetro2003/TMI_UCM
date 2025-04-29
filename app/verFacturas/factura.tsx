@@ -114,7 +114,7 @@ export default function Factura() {
       await db.runAsync(`DELETE FROM Facturas WHERE id = ?;`, [factura?.id]);
 
       // Redirige a verFacturas
-      router.push("../..");
+      router.push("../verFacturas/verFacturas");
     } catch (error) {
       console.log("Error al eliminar la factura:", error);
     }
