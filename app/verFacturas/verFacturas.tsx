@@ -3,10 +3,14 @@ import { StyleSheet, Text, View } from "react-native";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import MenuButtons from "@/components/MenuButton";
+import Search from "@/components/Search";
 
 export default function VerFacturas () {
     const db = useSQLiteContext();
     const [data, setData]= useState<any[]>([])
+    const [showedData, setShowedData]= useState<any[]>([])
+
+
     
 
     const getFacturas = async () => {
@@ -32,6 +36,7 @@ export default function VerFacturas () {
                 INNER JOIN establecimientos as e on e.id=f.establecimiento;
                 `);
             setData(facturas_establecimientos);
+            setShowedData(facturas_establecimientos);
             console.log("data", facturas_establecimientos);
            
         } catch (error) {
@@ -46,8 +51,8 @@ export default function VerFacturas () {
     return (
 
         <View style={styles.container}>
-      
-<MenuButtons buttonsInfo={data}></MenuButtons>
+      <Search data={data} setShowedData={setShowedData} />
+<MenuButtons buttonsInfo={showedData}></MenuButtons>
             <Link style={styles.button} href="..">
                 Atrás
             </Link>
