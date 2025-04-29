@@ -36,7 +36,7 @@ export default function FacturaForm(
       ) as any[];
       let establecimientoId
 
-      if (!establecimiento) {
+      if (establecimiento.length === 0 || !establecimiento) {
         const resultEstablecimiento = await db.runAsync(
           ` 
           INSERT OR IGNORE INTO Establecimientos (nombre) 
@@ -45,7 +45,9 @@ export default function FacturaForm(
         );  
         establecimientoId = resultEstablecimiento.lastInsertRowId;
       } else {
+        console.log("Establecimiento", establecimiento);
         establecimientoId = establecimiento[0].id;
+        console.log("EstablecimientoId", establecimientoId);
       }
      
 
@@ -67,7 +69,7 @@ export default function FacturaForm(
         const product = await db.getAllAsync(
           `SELECT * FROM Productos WHERE name = ?;`, [item.name]
         ) as any[];
-        let productId;
+        let productId: string | number | null = null;
         if (product.length > 0) {
           product.forEach(element => {
             if (element.name === item.name && element.price_per_unit === pricePerUnit) {
