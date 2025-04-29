@@ -19,8 +19,8 @@ export default function AgregarFacturas () {
     const client = new TextractClient({
          region: "eu-west-3", 
         credentials: {
-            accessKeyId: process.env.ACCESS_KEY_ID as string,
-            secretAccessKey: process.env.SECRET_ACCESS_KEY as string,
+            accessKeyId: process.env.EXPO_PUBLIC_ACCESS_KEY_ID as string,
+            secretAccessKey: process.env.EXPO_PUBLIC_SECRET_ACCESS_KEY as string,
         },
         });
 
