@@ -70,9 +70,10 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     button: {
-        backgroundColor: "blue",
+        backgroundColor: "#4A4E69",
         color: "white",
         padding: 10,
         borderRadius: 5,
+        marginBottom: 10,
     },
 });

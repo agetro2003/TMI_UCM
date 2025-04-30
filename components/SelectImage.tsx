@@ -40,7 +40,7 @@ export default function SelectImage({setImage }: {setImage: (image: string) => v
                     }} 
                 onPress={pickImage}
                 buttonStyle={{
-                    backgroundColor: "blue",
+                    backgroundColor: "#4A4E69",
                     borderRadius: 90,
                 }}
                 />
@@ -53,7 +53,7 @@ export default function SelectImage({setImage }: {setImage: (image: string) => v
                 }} 
                 onPress={takeImage}
                 buttonStyle={{
-                    backgroundColor: "blue",
+                    backgroundColor: "#4A4E69",
                     borderRadius: 90,
                 }}
                  />
