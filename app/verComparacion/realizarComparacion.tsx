@@ -1,217 +1,261 @@
-import React from "react";
-import { ScrollView, View, Text, StyleSheet, Dimensions } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Image, ScrollView, View, Text, StyleSheet, Dimensions } from "react-native";
 import { PieChart, BarChart, LineChart } from "react-native-chart-kit";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams } from "expo-router";
+import { useSQLiteContext } from "expo-sqlite";
+type MonthData = { month: string; total: number };
 
-const factura = {
-  VENDOR_NAME: "Mercadona S.A.",
-  ADDRESS_BLOCK: "Rda. de Atocha, 26, Centro, 28012, Madrid",
-  TELEPHONE: "91 95 45 71",
-  INVOICE_RECEIPT_DATE: "20/02/2025 09:51",
-  ITEMS: [
-    { ITEM: "Pan blanco", QUANTITY: 1, PRICE: 1.05 },
-    { ITEM: "Nata Cocinar", QUANTITY: 2, PRICE: 1.00 },
-    { ITEM: "Rollo Cocina", QUANTITY: 2, PRICE: 2.95 },
-    { ITEM: "Mermelada Fresa", QUANTITY: 1, PRICE: 2.10 },
-    { ITEM: "Filete Merluza", QUANTITY: 1, PRICE: 4.20 },
-  ],
-  TOTAL: 15.39,
+const monthNames = [
+  "Enero","Febrero","Marzo","Abril","Mayo","Junio",
+  "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
+];
+
+const categoryIcons: Record<string, any> = {
+  comestibles: require('@/assets/images/comestibles.png'),
+  electronica: require('@/assets/images/electronica.png'), 
+  entretenimiento: require('@/assets/images/entretenimiento.png'),
+  higiene: require('@/assets/images/higiene.png'),
+  ropa: require('@/assets/images/ropa.png'), 
 };
 
 const screenWidth = Dimensions.get("window").width;
 
-// Prepara datos comunes
-const totalPrice = factura.ITEMS.reduce((sum, item) => sum + item.PRICE, 0);
-const pieData = factura.ITEMS.map((item, index) => {
-  const percentage = ((item.PRICE / totalPrice) * 100).toFixed(2);
-  return {
-    name: item.ITEM,
-    population: item.PRICE,
-    percentage,
-    color: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"][index % 5],
-    legendFontColor: "#7F7F7F",
-    legendFontSize: 14,
-  };
-});
-const barLabels = factura.ITEMS.map(i => i.ITEM);
-const barValues = factura.ITEMS.map(i => i.PRICE);
-
 export default function RealizarComparacion() {
-  const { graphType } = useLocalSearchParams<{ graphType: string }>();
+  const { category, variableType, variable, graphType } = useLocalSearchParams<{ category: string; variableType: "year" | "establishment"; variable: string; graphType: "pie" | "bar" | "line"; }>();
+  const db = useSQLiteContext();
+  const zeroed = monthNames.map(m => ({ month: m, total: 0 }));
+  const [data, setData] = useState<MonthData[]>(zeroed);
+  const [totalAll, setTotalAll] = useState(0);
+
+  useEffect(() => {
+    (async () => {
+      let rows: { mes: string; total: number }[] = [];
+
+      if (variableType === "year") {
+        rows = await db.getAllAsync(
+          `SELECT substr(f.fecha,4,2) AS mes, SUM(fp.price) AS total
+           FROM Factura_Productos fp
+           JOIN Facturas f ON fp.factura_id = f.id
+           JOIN Productos p ON fp.producto_id = p.id
+           WHERE substr(f.fecha,7,4)=? AND p.tag=?
+           GROUP BY mes;`,
+          [variable, category]
+        );
+      } else {
+        rows = await db.getAllAsync(
+          `SELECT e.nombre AS mes, SUM(fp.price) AS total
+           FROM Factura_Productos fp
+           JOIN Facturas f ON fp.factura_id = f.id
+           JOIN Establecimientos e ON f.establecimiento = e.id
+           JOIN Productos p ON fp.producto_id = p.id
+           WHERE substr(f.fecha,7,4)=? AND p.tag=?
+           GROUP BY e.nombre;`,
+          [variable, category]
+        );
+      }
+
+      const mapped = variableType === "year"
+        ? monthNames.map((name, i) => {
+            const key = (i+1).toString().padStart(2,"0");
+            const found = rows.find(r => r.mes===key);
+            return { month: name, total: found?.total ?? 0 };
+          })
+        : rows.map(r => ({ month: r.mes, total: r.total }));
+
+      setData(mapped);
+      setTotalAll(mapped.reduce((sum, d) => sum + d.total, 0));
+    })();
+  }, []);
+
+  let dataset = data.map(d => isFinite(d.total) ? d.total : 0);
+  const max = Math.max(...dataset);
+  const min = Math.min(...dataset);
+  if (max === min) dataset[dataset.length - 1] = max + 1;
+
+  const labels = data.map(d => d.month);
+  const pieData = data.map((d,i) => ({
+    name: d.month,
+    population: d.total,
+    color: ["#FF6384","#36A2EB","#FFCE56","#4BC0C0","#9966FF",'#89d256','#b46cd7','#8099d5', '#d58c80','#ffc259','#b2b0ad','#80d4d0'][i%12],
+    legendFontColor: "#7F7F7F",
+    legendFontSize: 12,
+  }));
+
+  const commonConfig = {
+    backgroundColor: "#fff",
+    backgroundGradientFrom: "#fff",
+    backgroundGradientTo: "#fff",
+    color: (opacity=1) => `rgba(0,0,0,${opacity})`,
+    labelColor: (opacity=1) => `rgba(0,0,0,${opacity})`,
+    propsForLabels: {
+      fontSize: 8
+    },
+    propsForVerticalLabels: {
+      fontSize: 10
+    },
+    propsForHorizontalLabels: {
+      fontSize: 10
+    },
+    propsForDots: {
+      r: "3"
+    },
+    barPercentage: 0.3,  
+  };
 
   const renderChart = () => {
-    const commonConfig = {
-      backgroundColor: "#ffffff",
-      backgroundGradientFrom: "#ffffff",
-      backgroundGradientTo: "#ffffff",
-      color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-    };
-
-    switch (graphType) {
+    const CARD_MARGIN = 16;
+    const CARD_PADDING = 16;
+    const chartWidth = screenWidth - (CARD_MARGIN * 2) - (CARD_PADDING * 2);
+    switch(graphType) {
       case "bar":
         return (
           <BarChart
-            data={{ labels: barLabels, datasets: [{ data: barValues }] }}
-            width={screenWidth - 50}
-            height={150}
+          style={{ 
+            marginVertical: 4,
+            alignSelf: 'flex-start',
+            paddingBottom: 16,
+            marginLeft: -15
+          }}
+            data={{ labels, datasets:[{ data: dataset }] }}
+            width={chartWidth} height={220}
             chartConfig={commonConfig}
-            yAxisLabel="€"
+            yAxisLabel="€" 
             yAxisSuffix=""
+            fromZero
+            showValuesOnTopOfBars
+            verticalLabelRotation={20}
+            segments={5}
           />
         );
       case "line":
         return (
           <LineChart
-            data={{ labels: barLabels, datasets: [{ data: barValues }] }}
-            width={screenWidth - 50}
-            height={150}
+            style={{
+              marginVertical: 4,
+              alignSelf: 'flex-start',
+              paddingBottom: 20,
+              marginLeft: -10
+            }}
+            data={{ labels, datasets:[{ data: dataset }] }}
+            width={chartWidth} height={220}
             chartConfig={commonConfig}
+            verticalLabelRotation={17}
+            segments={5}
+            bezier
           />
         );
-      case "pie":
       default:
         return (
           <PieChart
+            style={styles.chartCentered}
             data={pieData}
-            width={screenWidth - 50}
-            height={150}
+            width={chartWidth} height={180}
             chartConfig={commonConfig}
             accessor="population"
             backgroundColor="transparent"
-            paddingLeft="-5"
-            absolute={false}
+            paddingLeft="50"
+            hasLegend={false}
           />
         );
     }
   };
 
   return (
-    <ScrollView style={{ flex: 1, padding: 10 }} contentContainerStyle={{ paddingBottom: 20 }}>
-      <View style={styles.container}>
-        {/* Fondo degradado superior */}
-        <LinearGradient colors={["#332b80", "#7a74b8"]} style={styles.header}>
-          <Text style={styles.headerTitle}>Comparativa</Text>
-          <Text style={styles.month}>{graphType?.toUpperCase() || ""}</Text>
-        </LinearGradient>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom:20 }}>
+      <LinearGradient colors={["#332b80","#7a74b8"]} style={styles.header}>
+      <View style={styles.headerTextContainer}>
+        <Text style={styles.headerTitle}>Comparativa</Text>
+        <Text style={styles.subTitle}>
+          {variableType==="year"
+            ? `Año ${variable} • ${category}`
+            : `Establecimientos ${variable} • ${category}`}
+        </Text>
+      </View>
+      { categoryIcons[category] && (
+        <Image
+          source={categoryIcons[category]}
+          style={styles.headerIcon}
+        />
+        ) }
+      </LinearGradient>
 
-        {/* Tarjeta de información */}
-        <View style={styles.card}>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoTitle}>Promedio</Text>
-            <Text style={styles.infoValue}>
-              {(totalPrice / factura.ITEMS.length).toFixed(2)}€
-            </Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoTitle}>Total</Text>
-            <Text style={styles.infoValue}>{totalPrice.toFixed(2)}€</Text>
-          </View>
 
-          {/* Gráfico dinámico */}
-          {renderChart()}
-
-          {/* Leyenda / lista */}
-          {pieData.map((item, index) => (
-            <View key={index} style={styles.listItem}>
-              <View style={[styles.dot, { backgroundColor: item.color }]} />
-              <View style={styles.categoryContainer}>
-                <Text style={styles.category}>{item.name}</Text>
-                <Text style={styles.percentage}>{item.percentage}%</Text>
-              </View>
-              <Text style={styles.amount}>{item.population.toFixed(2)}€</Text>
-            </View>
-          ))}
+      <View style={styles.card}>
+        <View style={styles.infoRow}>
+          <Text style={styles.infoTitle}>Total</Text>
+          <Text style={styles.infoValue}>{totalAll.toFixed(2)}€</Text>
         </View>
+
+        {renderChart()}
+
+        {pieData.map((item,idx) => (
+          <View key={idx} style={styles.legendItem}>
+            <View style={[styles.dot,{ backgroundColor:item.color }]} />
+            <Text style={styles.legendText}>
+            {item.name} – {item.population.toFixed(2)}€
+          </Text>
+          </View>
+        ))}
       </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F5F5",
-    alignItems: "center",
-  },
+  container: { flex:1, backgroundColor:"#F5F5F5" },
   header: {
     width: "100%",
-    height: 160,
-    borderBottomLeftRadius: 5,
-    borderBottomRightRadius: 5,
-    paddingTop: 50,
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "flex-start",
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 20,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#FFFFFF",
-  },
-  month: {
-    fontSize: 16,
-    color: "#D8D8D8",
-    marginTop: 5,
-  },
-  card: {
-    backgroundColor: "#FFFFFF",
-    width: "99%",
-    borderRadius: 15,
-    paddingVertical: 20,
-    paddingHorizontal: 15,
-    marginTop: -30,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
-    alignItems: "center",
-  },
-  infoRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    marginBottom: 10,
-  },
-  infoTitle: {
-    fontSize: 16,
-    color: "#7F7F7F",
-  },
-  infoValue: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#333",
+    color: "#FFF",
   },
-  listItem: {
+  subTitle: {
+    fontSize: 14,
+    color: "#D8D8D8",
+    marginTop: 4,
+  },
+  card: { backgroundColor:"#FFF", margin:16, borderRadius:12, padding:16, elevation:3 },
+  infoRow: { flexDirection:"row", justifyContent:"space-between", marginBottom:12 },
+  infoTitle: { fontSize:16, color:"#7F7F7F" },
+  infoValue: { fontSize:18, fontWeight:"bold", color:"#333" },
+  chart: { 
+    marginVertical: 4, 
+    alignSelf: 'flex-start',
+    paddingBottom: 20 
+  },  
+  chartCentered: { marginVertical: 8, alignSelf: 'center' },
+  dot: { width:10, height:10, borderRadius:5, marginRight:8 },
+  legendText: {
+    fontSize: 14,
+    color: "#333",
+    flexShrink: 1,       // Permite encoger el texto si es necesario
+    flexWrap: "wrap"     // Permite distribuir el texto en varias líneas
+  },
+  legendItem: {
     flexDirection: "row",
     alignItems: "center",
-    width: "100%",
-    backgroundColor: "#F5F5F5",
-    padding: 10,
-    borderRadius: 10,
-    marginVertical: 5,
+    marginTop: 8,
+    flexWrap: "wrap"
   },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginRight: 10,
+  headerIcon: {
+    width: 60,
+    height: 60,
+    marginLeft: 12,
+    marginRight: 30,
+    resizeMode: "contain",
   },
-  categoryContainer: {
+  headerTextContainer: {
     flex: 1,
-    flexDirection: "column",
-  },
-  category: {
-    fontSize: 14,
-    color: "#333",
-    fontWeight: "bold",
-  },
-  percentage: {
-    fontSize: 12,
-    color: "#7F7F7F",
-    marginTop: 2,
-  },
-  amount: {
-    fontSize: 14,
-    fontWeight: "bold",
+    justifyContent: "center", 
+    marginLeft: 16,
   },
 });

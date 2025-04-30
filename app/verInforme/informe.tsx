@@ -47,7 +47,7 @@ export default function Informe() {
   const pieData = products.map((p, i) => ({
     name: p.name,
     population: p.totalPrice,
-    color: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"][i % 5],
+    color: ["#FF6384","#36A2EB","#FFCE56","#4BC0C0","#9966FF",'#89d256','#b46cd7','#8099d5', '#d58c80','#ffc259','#b2b0ad','#80d4d0'][i%12],
     legendFontColor: "#7F7F7F",
     legendFontSize: 14,
   }));
