@@ -55,6 +55,9 @@ export default function FacturaForm(
       // ver estructura de la tabla Facturas
      // const tablaFacturas = await db.getAllAsync("PRAGMA table_info(Facturas);");
       //console.log("Estructura de la tabla Facturas: \n", tablaFacturas);
+      formData.total = formData.total.split(" ")[0];
+      formData.total = formData.total.replace(",", ".");
+      
       const resultFactura = await db.runAsync(
         `
         INSERT INTO Facturas (establecimiento, fecha, total, address) 
