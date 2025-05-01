@@ -134,22 +134,22 @@ export default function Factura() {
         {/* Nombre de empresa */}
         <View style={styles.fieldContainer}>
           <Text style={styles.inputLabel}>Nombre de empresa</Text>
-          <Text style={styles.inputValue}>{factura.establecimiento}</Text>
+          <Text style={styles.mainValue}>{factura.establecimiento}</Text>
         </View>
         {/* Dirección */}
         <View style={styles.fieldContainer}>
           <Text style={styles.inputLabel}>Dirección</Text>
-          <Text style={styles.inputValue}>{factura.address}</Text>
+          <Text style={styles.mainValue}>{factura.address}</Text>
         </View>
         {/* Fecha */}
         <View style={styles.fieldContainer}>
           <Text style={styles.inputLabel}>Fecha de la factura</Text>
-          <Text style={styles.inputValue}>{factura.fecha}</Text>
+          <Text style={styles.mainValue}>{factura.fecha}</Text>
         </View>
         {/* Total */}
         <View style={styles.fieldContainer}>
           <Text style={styles.inputLabel}>Total (€)</Text>
-          <Text style={styles.inputValue}>{factura.total.toFixed(2)}</Text>
+          <Text style={styles.mainValue}>{factura.total.toFixed(2)}</Text>
         </View>
 
         <View style={styles.divider} />
@@ -223,6 +223,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: '#fff',
     lineHeight: 40,
+    color: '#000',
+  },
+  mainValue: {
+    paddingHorizontal: 10,
+    fontSize: 16,
     color: '#000',
   },
   row: {

@@ -57,7 +57,7 @@ export default function FacturaForm(
       //console.log("Estructura de la tabla Facturas: \n", tablaFacturas);
       formData.total = formData.total.split(" ")[0];
       formData.total = formData.total.replace(",", ".");
-      
+
       const resultFactura = await db.runAsync(
         `
         INSERT INTO Facturas (establecimiento, fecha, total, address) 
@@ -68,6 +68,11 @@ export default function FacturaForm(
         
         item.price = item.price.split(" ")[0];
         item.price =item.price.replace(",", ".");
+        
+        if(item.unit_price){
+          item.unit_price = item.unit_price.split(" ")[0];
+          item.unit_price = item.unit_price.replace(",", ".");
+        }
 
         const pricePerUnit = item.unit_price ? item.unit_price : Number(item.price) / Number(item.quantity);
         const product = await db.getAllAsync(
