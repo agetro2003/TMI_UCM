@@ -139,9 +139,9 @@ export default function ComparacionForm() {
             itemStyle={styles.pickerItem}
           >
             <Picker.Item label="— Selecciona —" value={null} />
-            <Picker.Item label="Pie" value="pie" />
-            <Picker.Item label="Bar" value="bar" />
-            <Picker.Item label="Line" value="line" />
+            <Picker.Item label="Sectores" value="pie" />
+            <Picker.Item label="Barras" value="bar" />
+            <Picker.Item label="Líneas" value="line" />
           </Picker>
         </View>
 
