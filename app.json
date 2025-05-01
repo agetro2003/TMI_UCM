@@ -4,21 +4,21 @@
     "slug": "letsave",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/letSave-icon.png",
+    "icon": "./assets/images/letSave-icon-smaller.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "icon": {
-        "dark":  "./assets/images/letSave-icon.png",
-        "light":  "./assets/images/letSave-icon.png",
-        "tinted":  "./assets/images/letSave-icon.png"
+        "dark":  "./assets/images/letSave-icon-smaller.png",
+        "light":  "./assets/images/letSave-icon-smaller.png",
+        "tinted":  "./assets/images/letSave-icon-smaller.png"
       }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/letSave-icon.png",
+        "foregroundImage": "./assets/images/letSave-icon-smaller.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.agetro.letsave"
