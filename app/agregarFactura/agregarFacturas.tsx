@@ -10,7 +10,6 @@ import { useRouter } from "expo-router";
 import { Image } from "expo-image";
 import {classifier}  from "@/api/axios"
 import axios from "axios";
-import Constants from "expo-constants";
 
 
 
@@ -98,7 +97,7 @@ const detectLogos = async (image: string) => {
         // Leer la imagen y convertirla a Base64
         const base64 = await FileSystem.readAsStringAsync(image, { encoding: 'base64' });
         // Configurar la solicitud a la API REST de Vision
-        const apiKey = Constants.manifest?.extra?.GOOGLE_CLOUD_API_KEY || Constants.expoConfig?.extra?.GOOGLE_CLOUD_API_KEY;
+        const apiKey = process.env.GOOGLE_CLOUD_API_KEY || process.env.EXPO_PUBLIC_GOOGLE_CLOUD_API_KEY as string;
         if (!apiKey) {
             console.error("La clave de API no está configurada.");
             return [];

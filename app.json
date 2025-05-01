@@ -45,7 +45,6 @@
       "typedRoutes": true
     },
     "extra": {
-      "GOOGLE_CLOUD_API_KEY": "apiKeyAQUI",
       "router": {
         "origin": false
       },
