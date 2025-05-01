@@ -9,12 +9,14 @@ import { Icon } from "@rneui/themed";
 import { useRouter } from "expo-router";
 import { Image } from "expo-image";
 import {classifier}  from "@/api/axios"
+import { RekognitionClient, DetectLabelsCommand } from "@aws-sdk/client-rekognition";
 
 export default function AgregarFacturas () {
     const [image, setImage] = useState<string | null>(null);
     const [imageBuffer, setImageBuffer] = useState<string | ArrayBuffer | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const router = useRouter();
+    const [logos, setLogos] = useState<any[]>([]);
 
     const client = new TextractClient({
          region: "eu-west-3", 
@@ -23,6 +25,14 @@ export default function AgregarFacturas () {
             secretAccessKey: process.env.SECRET_ACCESS_KEY || process.env.EXPO_PUBLIC_SECRET_ACCESS_KEY as string,
         },
         });
+    
+    const rekognitionClient = new RekognitionClient({
+        region: "eu-west-3",
+        credentials: {
+            accessKeyId: process.env.ACCESS_KEY_ID  || process.env.EXPO_PUBLIC_ACCESS_KEY_ID as string,
+            secretAccessKey: process.env.SECRET_ACCESS_KEY || process.env.EXPO_PUBLIC_SECRET_ACCESS_KEY as string,
+        },
+    });
 
 
 const getValueFromResponse = (response: AnalyzeExpenseCommandOutput, type: string) => {
@@ -88,6 +98,29 @@ const base64toUint8Array = (base64: string) => {
 };
 
 
+const detectLogos = async (imageBuffer: Uint8Array) => {
+    const params = {
+        Image: { Bytes: imageBuffer },
+        MaxLabels: 10, // Número máximo de etiquetas a detectar
+        MinConfidence: 70, // Nivel mínimo de confianza para considerar un logo detectado
+    };
+
+    try {
+        const command = new DetectLabelsCommand(params);
+        const response = await rekognitionClient.send(command);
+
+        // Filtra las etiquetas que contienen "Logo"
+        const logos = response.Labels?.filter(label => label.Name?.toLowerCase().includes("logo"));
+        return logos?.map(logo => ({
+            name: logo.Name,
+            confidence: logo.Confidence,
+        }));
+    } catch (error) {
+        console.error("Error al detectar logos:", error);
+        return [];
+    }
+};
+
 
 // analyze invoice and receipt images
     const analyzeImage = async (image: string) => {
@@ -96,7 +129,12 @@ const base64toUint8Array = (base64: string) => {
         try {
            // Leer la imagen y convertirla a Base64
            const base64 = await FileSystem.readAsStringAsync(image, { encoding: 'base64' });
-            const imageBuffer = base64toUint8Array(base64);
+           const imageBuffer = base64toUint8Array(base64);
+
+           // Detectar logos
+            const detectedLogos = await detectLogos(imageBuffer);
+            setLogos(detectedLogos);
+            console.log("Detected logos:", detectedLogos);
            // Configurar los parámetros de la solicitud a AWS Textract
            const params = {
                Document: { Bytes: imageBuffer },
@@ -126,6 +164,8 @@ const base64toUint8Array = (base64: string) => {
                 pathname: "../agregarFactura/formulario",
                 params: { receiptData: JSON.stringify(receiptData) }, // Convertir a string
             });
+
+            
         } catch (error) {
             console.log("Error al analizar imagen", error);
         }
@@ -161,6 +201,18 @@ const base64toUint8Array = (base64: string) => {
         <Text style={styles.headerText}>Seleccione una imagen para procesar</Text>
         
         <Image style={styles.image} source={{uri:image as string }} />
+
+        {logos.length > 0 && (
+            <View>
+                <Text style={styles.headerText}>Logos Detectados:</Text>
+                {logos.map((logo, index) => (
+                    <Text key={index}>
+                        {logo.name} - Confianza: {logo.confidence?.toFixed(2)}%
+                    </Text>
+                ))}
+            </View>
+        )}
+        
         <SelectImage setImage={setImage} />
         </View>
     );
