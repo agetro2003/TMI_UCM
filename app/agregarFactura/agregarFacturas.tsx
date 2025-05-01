@@ -9,6 +9,11 @@ import { Icon } from "@rneui/themed";
 import { useRouter } from "expo-router";
 import { Image } from "expo-image";
 import {classifier}  from "@/api/axios"
+import axios from "axios";
+import Constants from "expo-constants";
+
+
+
 
 export default function AgregarFacturas () {
     const [image, setImage] = useState<string | null>(null);
@@ -23,7 +28,7 @@ export default function AgregarFacturas () {
             secretAccessKey: process.env.SECRET_ACCESS_KEY || process.env.EXPO_PUBLIC_SECRET_ACCESS_KEY as string,
         },
         });
-
+        
 
 const getValueFromResponse = (response: AnalyzeExpenseCommandOutput, type: string) => {
     let value = "";
@@ -88,12 +93,44 @@ const base64toUint8Array = (base64: string) => {
 };
 
 
+const detectLogos = async (image: string) => {
+    try {
+        // Leer la imagen y convertirla a Base64
+        const base64 = await FileSystem.readAsStringAsync(image, { encoding: 'base64' });
+        // Configurar la solicitud a la API REST de Vision
+        const apiKey = Constants.manifest?.extra?.GOOGLE_CLOUD_API_KEY || Constants.expoConfig?.extra?.GOOGLE_CLOUD_API_KEY;
+        if (!apiKey) {
+            console.error("La clave de API no está configurada.");
+            return [];
+        }
+        const url = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`;
+        const requestBody = {
+            requests: [
+                {
+                    image: { content: base64 },
+                    features: [{ type: "LOGO_DETECTION", maxResults: 10 }],
+                },
+            ],
+        };
+        const response = await axios.post(url, requestBody);
+        const logos = response.data.responses[0].logoAnnotations || [];
+        console.log("Logos detectados:", logos);
+
+        return logos.map((logo: any) => logo.description); // Devuelve el nombre del logotipo detectado
+    } catch (error) {
+        console.error("Error al detectar logotipos:", error);
+        return [];
+    }
+};
 
 // analyze invoice and receipt images
     const analyzeImage = async (image: string) => {
         setLoading(true);
 
         try {
+            const logos = await detectLogos(image);
+            console.log("Logotipos detectados:", logos);
+
            // Leer la imagen y convertirla a Base64
            const base64 = await FileSystem.readAsStringAsync(image, { encoding: 'base64' });
             const imageBuffer = base64toUint8Array(base64);
@@ -104,12 +141,15 @@ const base64toUint8Array = (base64: string) => {
                 
             const eExpense = new AnalyzeExpenseCommand(params);
             const response = await client.send(eExpense);
-            let establecimiento = getValueFromResponse(response, "VENDOR_NAME");
+            let textractEstablecimiento = getValueFromResponse(response, "VENDOR_NAME");
             let fecha = getValueFromResponse(response, "INVOICE_RECEIPT_DATE");
             let total = getValueFromResponse(response, "TOTAL");
             let address = getValueFromResponse(response, "ADDRESS_BLOCK");
             let items = getItemsFromResponse(response);
             
+            // Usar el primer logotipo detectado como establecimiento, o el valor de Textract si no hay logotipos
+            let establecimiento = logos.length > 0 ? logos[0] : textractEstablecimiento;
+
             const namesOfProducts = items.map((item: any) => item.name);
             const res = await classifier.post(
                 "/categorizar",
