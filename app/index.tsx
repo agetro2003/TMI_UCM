@@ -164,7 +164,7 @@ export default function Hello() {
            <View style={styles.header}>
                 <View>
                     <Text style={styles.greeting}>Buenos días 👋</Text>
-                    <Text style={styles.username}>Pepito Pérez</Text>
+                    <Text style={styles.username}>Bienvenido a Let$ave</Text>
                 </View>
             </View>
         <IndexButtons buttonsInfo={buttonsInfo} />
