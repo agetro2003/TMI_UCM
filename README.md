@@ -19,12 +19,12 @@ npm install
 
 * Ejecutar proyecto (en caso de error pruebe agregar la flag --tunnel)
 ```
-npx expo start 
+npx expo start --offline
 ```
 
 * Escanear QR con la aplicacion Expo Go
 
-## Para crear APK 
+## Para crear APK (Solo podra ejecutarse en Android)
 
 ### Requisitos
 * EAS CLI
