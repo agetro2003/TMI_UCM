@@ -99,7 +99,7 @@ const detectLogos = async (image: string) => {
         // Configurar la solicitud a la API REST de Vision
         const apiKey = process.env.GOOGLE_CLOUD_API_KEY || process.env.EXPO_PUBLIC_GOOGLE_CLOUD_API_KEY as string;
         if (!apiKey) {
-            console.error("La clave de API no está configurada.");
+            console.error("La clave de Cloud Vision API no está configurada.");
             return [];
         }
         const url = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`;
@@ -113,7 +113,7 @@ const detectLogos = async (image: string) => {
         };
         const response = await axios.post(url, requestBody);
         const logos = response.data.responses[0].logoAnnotations || [];
-        console.log("Logos detectados:", logos);
+        console.log("Logotipos detectados:", logos);
 
         return logos.map((logo: any) => logo.description); // Devuelve el nombre del logotipo detectado
     } catch (error) {
